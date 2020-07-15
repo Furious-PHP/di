@@ -7,6 +7,8 @@ namespace Furious\Container;
 use Closure;
 use Furious\Container\Exception\DefinitionNotFoundException;
 use Psr\Container\ContainerInterface;
+use function array_key_exists;
+use function class_exists;
 
 final class Container implements ContainerInterface
 {
@@ -19,7 +21,10 @@ final class Container implements ContainerInterface
             return $this->values[$id];
         }
 
-        if (!$this->has($id)) {
+        if (!$this->hasDefinition($id)) {
+            if ($this->classExists($id)) {
+                return $this->values[$id] = new $id;
+            }
             throw new DefinitionNotFoundException($id);
         }
 
@@ -46,6 +51,16 @@ final class Container implements ContainerInterface
 
     public function has($id): bool
     {
+        return array_key_exists($id, $this->definitions) or $this->classExists($id);
+    }
+
+    private function remove($id): void
+    {
+        unset($this->values[$id]);
+    }
+
+    private function hasDefinition($id): bool
+    {
         return array_key_exists($id, $this->definitions);
     }
 
@@ -54,8 +69,8 @@ final class Container implements ContainerInterface
         return array_key_exists($id, $this->values);
     }
 
-    private function remove($id): void
+    private function classExists($name): bool
     {
-        unset($this->values[$id]);
+        return class_exists((string) $name);
     }
 }

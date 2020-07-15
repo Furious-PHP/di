@@ -119,4 +119,17 @@ class ContainerTest extends TestCase
 
         $this->assertEquals($container->get('param'), $container->get('param1'));
     }
+
+    public function testAutoInstant()
+    {
+        $container = new Container();
+
+        $this->assertNotNull($value1 = $container->get(stdClass::class));
+        $this->assertNotNull($value2 = $container->get(stdClass::class));
+
+        $this->assertInstanceOf(stdClass::class, $value1);
+        $this->assertInstanceOf(stdClass::class, $value2);
+
+        $this->assertSame($value1, $value2);
+    }
 }
