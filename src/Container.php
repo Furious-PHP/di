@@ -25,7 +25,7 @@ final class Container implements ContainerInterface
 
         $def = $this->definitions[$id];
         if ($def instanceof Closure) {
-            return $this->values[$id] = $def();
+            return $this->values[$id] = $def($this);
         }
 
         return $this->values[$id] = $def;

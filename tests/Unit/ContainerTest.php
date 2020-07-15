@@ -96,4 +96,16 @@ class ContainerTest extends TestCase
         $this->assertNotNull($second);
         $this->assertEquals($first, $second);
     }
+
+    public function testPass(): void
+    {
+        $container = new Container;
+
+        $container->put('param', $value = 11111);
+        $container->put($param = 'param1', function (Container $container) {
+            return $container->get('param');
+        });
+
+        $this->assertEquals($container->get('param'), $container->get('param1'));
+    }
 }
