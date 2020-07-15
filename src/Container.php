@@ -31,6 +31,11 @@ final class Container implements ContainerInterface
         return $this->values[$id] = $def;
     }
 
+    public function set($id, $value): void
+    {
+        $this->put($id, $value);
+    }
+
     public function put($id, $value): void
     {
         if ($this->has($id)) {

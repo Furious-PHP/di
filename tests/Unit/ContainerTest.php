@@ -108,4 +108,16 @@ class ContainerTest extends TestCase
 
         $this->assertEquals($container->get('param'), $container->get('param1'));
     }
+
+    public function testSet(): void
+    {
+        $container = new Container;
+
+        $container->set('param', $value = 11111);
+        $container->set($param = 'param1', function (Container $container) {
+            return $container->get('param');
+        });
+
+        $this->assertEquals($container->get('param'), $container->get('param1'));
+    }
 }
