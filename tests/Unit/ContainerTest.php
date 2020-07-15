@@ -39,13 +39,13 @@ class ContainerTest extends TestCase
         $this->assertEquals($value, $container->get($param));
     }
 
-    public function testPutClojure(): void
+    public function testPutClosure(): void
     {
         $container = new Container;
         $container->put($param = 'param', $value = function () {
             return 2 + 2;
         });
-        $this->assertEquals($value, $container->get($param));
+        $this->assertEquals(4, $container->get($param));
     }
 
     public function testHas(): void

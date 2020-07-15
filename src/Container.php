@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Furious\Container;
 
+use Closure;
 use Furious\Container\Exception\DefinitionNotFoundException;
 use Psr\Container\ContainerInterface;
 
@@ -17,7 +18,12 @@ final class Container implements ContainerInterface
             throw new DefinitionNotFoundException($id);
         }
 
-        return $this->definitions[$id];
+        $def = $this->definitions[$id];
+        if ($def instanceof Closure) {
+            return $def();
+        }
+
+        return $def;
     }
 
     public function has($id): bool
