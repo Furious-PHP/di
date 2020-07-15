@@ -2,7 +2,7 @@
   "name": "furious/container",
   "description": "PHP 7.4 implementation of DI",
   "license": "MIT",
-  "keywords": ["di", "container", "dependency injection", "php", "php 7.4"],
+  "keywords": ["di", "container", "dependency injection", "php", "php 7.4", "psr 11", ""],
   "authors": [
     {
       "name": "Arslanov Rasul",
