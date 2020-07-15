@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Furious\Container\Unit;
 
+use Furious\Container\Exception\DefinitionNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Furious\Container\Container;
 use Psr\Container\ContainerExceptionInterface;
@@ -120,7 +121,7 @@ class ContainerTest extends TestCase
         $this->assertEquals($container->get('param'), $container->get('param1'));
     }
 
-    public function testAutoInstant()
+    public function testAutoInstant(): void 
     {
         $container = new Container();
 
@@ -131,5 +132,95 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $value2);
 
         $this->assertSame($value1, $value2);
+    }
+
+    // autowire tests
+
+    public function testAutoWire(): void 
+    {
+        $container = new Container();
+
+        $third = $container->get(Third::class);
+
+        $this->assertNotNull($third);
+        $this->assertInstanceOf(Third::class, $third);
+
+        $this->assertNotNull($second = $third->second);
+        $this->assertInstanceOf(Second::class, $second);
+
+        $this->assertNotNull($First = $second->first);
+        $this->assertInstanceOf(First::class, $First);
+    }
+
+    public function testAutowireScalar(): void
+    {
+        $container = new Container();
+
+        $this->expectException(DefinitionNotFoundException::class);
+        $container->get(ScalarWithOutDefault::class);
+    }
+
+    public function testAutowireScalarDefault(): void
+    {
+        $container = new Container();
+
+        $scalar = $container->get(ScalarWithArrayAndDefault::class);
+        $this->assertNotNull($scalar);
+        $this->assertNotNull($First = $scalar->first);
+        $this->assertInstanceOf(First::class, $First);
+        $this->assertEquals([], $scalar->array);
+        $this->assertEquals(10, $scalar->default);
+    }
+}
+
+class First
+{
+
+}
+
+class Second
+{
+    public First $first;
+
+    public function __construct(First $first)
+    {
+        $this->first = $first;
+    }
+}
+
+class Third
+{
+    public Second $second;
+
+    public function __construct(Second $second)
+    {
+        $this->second = $second;
+    }
+}
+
+class ScalarWithArrayAndDefault
+{
+    public First $first;
+    public array $array;
+    public int $default;
+
+    public function __construct(First $first, array $array, $default = 10)
+    {
+        $this->first = $first;
+        $this->array = $array;
+        $this->default = $default;
+    }
+}
+
+class ScalarWithOutDefault
+{
+    public First $first;
+    /** @var mixed */
+    public $some;
+
+    public function __construct(First $first, $some)
+    {
+        $this->first = $first;
+        $this->some = $some;
     }
 }

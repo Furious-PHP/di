@@ -7,14 +7,26 @@ namespace Furious\Container;
 use Closure;
 use Furious\Container\Exception\DefinitionNotFoundException;
 use Psr\Container\ContainerInterface;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionParameter;
 use function array_key_exists;
 use function class_exists;
 
 final class Container implements ContainerInterface
 {
-    private array $definitions = [];
     private array $values = [];
-    
+    private array $definitions;
+
+    /**
+     * Container constructor.
+     * @param array $definitions
+     */
+    public function __construct(array $definitions = [])
+    {
+        $this->definitions = $definitions;
+    }
+
     public function get($id)
     {
         if ($this->hasValue($id)) {
@@ -23,7 +35,7 @@ final class Container implements ContainerInterface
 
         if (!$this->hasDefinition($id)) {
             if ($this->classExists($id)) {
-                return $this->values[$id] = new $id;
+                return $this->values[$id] = $this->autowire($id);
             }
             throw new DefinitionNotFoundException($id);
         }
@@ -72,5 +84,43 @@ final class Container implements ContainerInterface
     private function classExists($name): bool
     {
         return class_exists((string) $name);
+    }
+
+    /**
+     * @param $id
+     * @return object
+     * @throws ReflectionException
+     */
+    private function autowire($id): object
+    {
+        $reflection = new ReflectionClass($id);
+        $arguments = [];
+
+        if (null !== ($constructor = $reflection->getConstructor())) {
+            foreach ($constructor->getParameters() as $param) {
+                $arguments[] = $this->getArgumentByParameter($param);
+            }
+        }
+
+        return $reflection->newInstanceArgs($arguments);
+    }
+
+    /**
+     * @param ReflectionParameter $param
+     * @return array|mixed
+     * @throws ReflectionException
+     */
+    private function getArgumentByParameter(ReflectionParameter $param)
+    {
+        if ($paramClass = $param->getClass()) {
+            return $this->get($paramClass->getName());
+        } elseif ($param->isArray()) {
+            return [];
+        } else {
+            if (!$param->isDefaultValueAvailable()) {
+                throw new DefinitionNotFoundException($param->getName());
+            }
+            return $param->getDefaultValue();
+        }
     }
 }
