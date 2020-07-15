@@ -49,6 +49,15 @@ class ContainerTest extends TestCase
         $this->assertEquals(4, $container->get($param));
     }
 
+    public function testPutWhenAlreadyHasValue(): void
+    {
+        $container = new Container;
+        $container->put('param', $value = 'value');
+        $this->assertEquals($value, $container->get('param'));
+        $container->put('param', $value1 = 'value1');
+        $this->assertEquals($value1, $container->get('param'));
+    }
+
     public function testHas(): void
     {
         $container = new Container;
