@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Furious\Container\Unit;
+namespace Tests\Furious\Container;
 
 use Furious\Container\Exception\DefinitionNotFoundException;
 use PHPUnit\Framework\TestCase;
