@@ -53,6 +53,7 @@ class ContainerTest extends TestCase
         $container = new Container;
 
         $container->put($param = 'param1', 'value1');
+        $container->get($param);
 
         $this->assertTrue($container->has($param));
         $this->assertFalse($container->has('value2'));
@@ -78,5 +79,21 @@ class ContainerTest extends TestCase
         $this->expectExceptionMessage('Definition not found for {' . $value . '}');
 
         $container->get($value);
+    }
+
+    public function testSingleton(): void
+    {
+        $container = new Container;
+
+        $container->put($param = 'param', function () {
+            return new stdClass;
+        });
+
+        $first = $container->get($param);
+        $second  = $container->get($param);
+
+        $this->assertNotNull($first);
+        $this->assertNotNull($second);
+        $this->assertEquals($first, $second);
     }
 }
