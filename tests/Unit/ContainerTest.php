@@ -53,7 +53,6 @@ class ContainerTest extends TestCase
         $container = new Container;
 
         $container->put($param = 'param1', 'value1');
-        $container->get($param);
 
         $this->assertTrue($container->has($param));
         $this->assertFalse($container->has('value2'));

@@ -15,11 +15,11 @@ final class Container implements ContainerInterface
     
     public function get($id)
     {
-        if ($this->has($id)) {
+        if ($this->hasValue($id)) {
             return $this->values[$id];
         }
 
-        if (!$this->hasDefinition($id)) {
+        if (!$this->has($id)) {
             throw new DefinitionNotFoundException($id);
         }
 
@@ -38,7 +38,7 @@ final class Container implements ContainerInterface
 
     public function put($id, $value): void
     {
-        if ($this->has($id)) {
+        if ($this->hasValue($id)) {
             $this->remove($id);
         }
         $this->definitions[$id] = $value;
@@ -46,12 +46,12 @@ final class Container implements ContainerInterface
 
     public function has($id): bool
     {
-        return array_key_exists($id, $this->values);
+        return array_key_exists($id, $this->definitions);
     }
 
-    private function hasDefinition($id): bool
+    private function hasValue($id): bool
     {
-        return array_key_exists($id, $this->definitions);
+        return array_key_exists($id, $this->values);
     }
 
     private function remove($id): void
